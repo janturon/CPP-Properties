@@ -23,14 +23,14 @@ Every property holds its own `.value` (auto-implemented, accessible by i.e. P1.v
       int nullObject;
 
       void lazyInit(int* val) {
-        P3.value = &nullObject;
+        P4.value = &nullObject;
         // do something
       }
 
       Test() : ... {
         nullObject = 42;
         P1.init(0);
-        P3.init(&Test::lazyInit);
+        P4.init(&Test::lazyInit);
       }
     };
 
@@ -46,27 +46,27 @@ The properties overloaded the assign and the type operator
 The *assign operator* is bound with functor operator and the *type operator* is bound with functor without params, so you can call i.e
 
     Test t;
-    t.P2 = "Hello"; // assigns the copy
-    t.P2("world"); // assigns the reference
-    string s = t.P2; // reads
-    puts(t.P2().c_str()); // reads and prints "world"
+    t.P3 = "Hello"; // assigns the copy
+    t.P3("world"); // assigns the reference
+    string s = t.P3; // reads
+    puts(t.P3().c_str()); // reads and prints "world"
   
 Where *type* means the type of the property value (i.e. string at P2). Auto-implementation reads and writes their values directly. To make some property read-only, use i.e.:
 
     P1.write(false);
-    P2.read(true).write(false);
+    P3.read(true).write(false);
 
 By default read and write are true. If forbidden read is performed, 1 is thrown, if forbidden write is performed, 2 is thrown. This behavior can be substitued by method calls, i.e.
 
     struct Test {
       ...
-      int*& getP2() {
+      int*& getP3() {
         // do something
         return P2.value;
       }
 
       Test() : ... {
-        P2.get(&Test::getP2);
+        P3.get(&Test::getP2);
       }
     };
 
@@ -76,7 +76,7 @@ The `.get()` calls overwrites eventual previous `.read()` settings and vice vers
       typedef property<Test,int> Int;
       Int P1,P2;
       ...
-      int*& getP(Int& src) {
+      int& getP(Int& src) {
         // do something
         return src.value;
       }
@@ -93,7 +93,7 @@ Of course there is also the `.set()` chain method, including the general version
       typedef property<Test,int> Int;
       Int P1,P2;
       ...
-      int*& getP(Int& src) {
+      int& getP(Int& src) {
         // do something
         return src.value;
       }
@@ -126,8 +126,8 @@ Note that reading and writing the value directly doesn't call eventual getter or
 
 Finally, every property contains `const void* meta` pointer, so the client code can associate any additional data to every property (this is useful i.e. for arrays: the property can hold its index). There are no helping methods, just the pointer, so the type and value control is up to the client code:
 
-    t.P1.metaConst = "reminder";  // write
-    puts((const char*)t.P1.metaConst);  // read
+    t.P1.meta = "reminder";  // write
+    puts((const char*)t.P1.meta);  // read
 
     int n = 42;
     t.P1.meta = &n; // write

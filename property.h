@@ -17,13 +17,13 @@ class property {
   MethodGet Mget; MethodSet Mset;
   HandlerGet Hget; HandlerSet Hset;
   bool Lget, Lset;
-  bool undefined;
+  bool defined;
   MethodInvalid initMethod;
   C* context;
 
 public:
   property<C,T>& create(C* c) {
-    undefined = true; context = c;
+    defined = false; context = c;
     Lget = true; Lset = true;
     getType = setType = Logical;
     initMethod = 0;
@@ -33,7 +33,7 @@ public:
   property<C,T>& create(C* c, T* initVal) { value = *initVal; return create(c); }
 
   T& operator()() {
-    if(undefined && initMethod!=0) ((context)->*initMethod)(*this);
+    if(!defined && initMethod!=0) ((context)->*initMethod)(*this);
     switch(getType) {
       case Method: return ((context)->*Mget)();
       case Handler: return ((context)->*Hget)(*this);
@@ -42,7 +42,7 @@ public:
     return value;
   }
   void operator()(const T& val) {
-    undefined = false;
+    defined = true;
     switch(setType) {
       case Method: ((context)->*Mset)(val); break;
       case Handler: ((context)->*Hset)(*this,val); break;
@@ -51,10 +51,10 @@ public:
   }
 
   T value;
-  property(C* c) { create(c); }
-  property(C* c, T initVal) { create(c,initVal); }
-  property(C* c, T* initVal) { create(c,initVal); }
-  property() { }
+  property(C* c) : valid(defined) { create(c); }
+  property(C* c, T initVal) : valid(defined) { create(c,initVal); }
+  property(C* c, T* initVal) : valid(defined) { create(c,initVal); }
+  property() : valid(defined) { }
 
   property<C,T>& get(MethodGet g) { getType = Method; Mget = g; return *this; }
   property<C,T>& set(MethodSet s) { setType = Method; Mset = s; return *this; }
@@ -65,9 +65,9 @@ public:
   T operator=(const T& val) { (*this)(val); return val; }
   operator T() { return (*this)(); }
 
-  bool valid() { return !undefined; }
   property<C,T>& init(const T& initVal) { value = initVal; return *this; }
   property<C,T>& init(MethodInvalid initVal) { initMethod = initVal; return *this; }
 
+  const bool& valid;
   const void* meta;
 };

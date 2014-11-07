@@ -1,4 +1,5 @@
 #pragma once
+#include <assert.h>
 
 /**
  * T propery type
@@ -33,20 +34,22 @@ public:
   property<C,T>& create(C* c, T* initVal) { value = *initVal; return create(c); }
 
   T& operator()() {
+    assert(getType==Logical && Lget || getType!=Logical);
     if(!defined && initMethod!=0) ((context)->*initMethod)(*this);
     switch(getType) {
       case Method: return ((context)->*Mget)();
       case Handler: return ((context)->*Hget)(*this);
-      case Logical: if(Lget) return value; else throw 1;
+      case Logical: return value;
     }
     return value;
   }
   void operator()(const T& val) {
+    assert(getType==Logical && Lset || getType!=Logical);
     defined = true;
     switch(setType) {
       case Method: ((context)->*Mset)(val); break;
       case Handler: ((context)->*Hset)(*this,val); break;
-      case Logical: if(!Lset) throw 2; else value = val; break;
+      case Logical: value = val;
     }
   }
 

@@ -34,9 +34,9 @@ Every property holds its own `.value` (auto-implemented, accessible by i.e. P1.v
       }
     };
 
-To check if property is defined at some time, call the `.valid()` method:
+To check if property is defined at some time, call the `.valid` read only field:
 
-    if(P1.valid()) // do something
+    if(P1.valid) // do something
 
 The properties overloaded the assign and the type operator
 

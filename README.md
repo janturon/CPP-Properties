@@ -56,7 +56,7 @@ Where *type* means the type of the property value (i.e. string at P2). Auto-impl
     P1.write(false);
     P3.read(true).write(false);
 
-By default read and write are true. If forbidden read is performed, 1 is thrown, if forbidden write is performed, 2 is thrown. This behavior can be substitued by method calls, i.e.
+By default read and write are true. Forbidden read and forbidden write are handled by asserts. This behavior can be substitued by method calls, i.e.
 
     struct Test {
       ...
